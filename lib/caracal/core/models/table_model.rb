@@ -21,7 +21,7 @@ module Caracal
         const_set(:DEFAULT_TABLE_BORDER_COLOR,      'auto')
         const_set(:DEFAULT_TABLE_BORDER_LINE,       :single)
         const_set(:DEFAULT_TABLE_BORDER_SIZE,       0)          # units in 1/8 points
-        const_set(:DEFAULT_TABLE_BORDER_SPACING,    0)          
+        const_set(:DEFAULT_TABLE_BORDER_SPACING,    0)
         
         # accessors
         attr_reader :table_align
@@ -185,7 +185,9 @@ module Caracal
         private
         
         def default_cell_width
-          cell_widths     = rows.first.map { |c| c.cell_width.to_i }
+          cell_widths     = rows.last.map { |c| c.cell_width.to_i } if rows.last.size >= rows.first.size
+          cell_widths     = rows.first.map { |c| c.cell_width.to_i } if rows.first.size > rows.last.size
+
           remaining_width = table_width - cell_widths.reduce(&:+).to_i
           remaining_cols  = cols.size - cell_widths.reject { |w| w == 0 }.size
           default_width   = (remaining_cols == 0) ? 0 : (remaining_width / remaining_cols)

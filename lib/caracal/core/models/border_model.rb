@@ -16,7 +16,7 @@ module Caracal
         
         # constants
         const_set(:DEFAULT_BORDER_COLOR,    'auto')
-        const_set(:DEFAULT_BORDER_LINE,     :single) 
+        const_set(:DEFAULT_BORDER_LINE,     :single)
         const_set(:DEFAULT_BORDER_SIZE,     4)        # 0.5pt in 1/8 points
         const_set(:DEFAULT_BORDER_SPACING,  1)        # 0.125pt in 1/8 points
         const_set(:DEFAULT_BORDER_TYPE,     :top)

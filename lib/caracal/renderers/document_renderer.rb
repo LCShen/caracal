@@ -277,22 +277,46 @@ module Caracal
             xml.send 'w:tblLook',   { 'w:val'  => '0600'  }
           end
           xml.send 'w:tblGrid' do
-            model.rows.first.each do |tc|
-              xml.send 'w:gridCol', { 'w:w' => tc.cell_width }
-            end
-            xml.send 'w:tblGridChange', { 'w:id' => '0' } do
-              xml.send 'w:tblGrid' do
-                model.rows.first.each do |tc|
-                  xml.send 'w:gridCol', { 'w:w' => tc.cell_width }
+
+            if model.rows.last.size >= model.rows.first.size
+              model.rows.last.each do |tc|
+                xml.send 'w:gridCol', { 'w:w' => tc.cell_width }
+              end
+              xml.send 'w:tblGridChange', { 'w:id' => '0' } do
+                xml.send 'w:tblGrid' do
+                  model.rows.last.each do |tc|
+                    xml.send 'w:gridCol', { 'w:w' => tc.cell_width }
+                  end
+                end
+              end
+            else
+              model.rows.first.each do |tc|
+                xml.send 'w:gridCol', { 'w:w' => tc.cell_width }
+              end
+              xml.send 'w:tblGridChange', { 'w:id' => '0' } do
+                xml.send 'w:tblGrid' do
+                  model.rows.first.each do |tc|
+                    xml.send 'w:gridCol', { 'w:w' => tc.cell_width }
+                  end
                 end
               end
             end
           end
-          model.rows.each do |row|
+          model.rows.each_with_index do |row, index|
             xml.send 'w:tr' do
               row.each do |tc|
                 xml.send 'w:tc' do
                   xml.send 'tcPr' do
+                    if row.size == 1
+                      if model.rows.last.size >= model.rows.first.size
+                        xml.send 'w:tcW', { 'w:w' => model.rows.last.inject(0) { |s, tc| s + tc.cell_width.to_f } , 'w:type' => 'dxa'}
+                        xml.send 'w:gridSpan', { 'w:val' => model.rows.last.size }
+                      else
+                        xml.send 'w:tcW', { 'w:w' => model.rows.first.inject(0) { |s, tc| s + tc.cell_width.to_f } , 'w:type' => 'dxa'}
+                        xml.send 'w:gridSpan', { 'w:val' => model.rows.first.size }
+                      end
+                      xml.send 'w:vAlign', { "w:val" => "center" }
+                    end
                     xml.send 'w:shd', { 'w:fill' => tc.cell_background }
                     xml.send 'w:tcMar' do
                       %w(top left bottom right).each do |d|
@@ -312,7 +336,7 @@ module Caracal
 
         # don't know why this is needed, but it prevents a
         # rendering error.
-        render_paragraph(xml, Caracal::Core::Models::ParagraphModel.new)
+        render_paragraph(xml, Caracal::Core::Models::ParagraphModel.new(text: '', size: 0))
       end
 
 
@@ -338,12 +362,16 @@ module Caracal
         }
       end
 
+      # 2015/10/05
       def page_margin_options
         {
           'w:top'    => document.page_margin_top,
           'w:bottom' => document.page_margin_bottom,
           'w:left'   => document.page_margin_left,
-          'w:right'  => document.page_margin_right
+          'w:right'  => document.page_margin_right,
+          'w:header' => document.page_margin_header,
+          'w:footer' => document.page_margin_footer,
+          'w:gutter' => document.page_margin_gutter
         }
       end
 

@@ -19,13 +19,18 @@ module Caracal
         const_set(:DEFAULT_MARGIN_BOTTOM, 0)  # units in twips
         const_set(:DEFAULT_MARGIN_LEFT,   0)  # units in twips
         const_set(:DEFAULT_MARGIN_RIGHT,  0)  # units in twips
+        const_set(:DEFAULT_MARGIN_HEADER,  0)  # units in twips
+        const_set(:DEFAULT_MARGIN_FOOTER,  0)  # units in twips
+        const_set(:DEFAULT_MARGIN_GUTTER,  0)  # units in twips
         
         # accessors
         attr_reader :margin_top
         attr_reader :margin_bottom
         attr_reader :margin_left
         attr_reader :margin_right
-        
+        attr_reader :margin_header
+        attr_reader :margin_footer
+        attr_reader :margin_gutter
         
         # initialization
         def initialize(options={}, &block)
@@ -33,6 +38,9 @@ module Caracal
           @margin_bottom = DEFAULT_MARGIN_BOTTOM
           @margin_left   = DEFAULT_MARGIN_LEFT
           @margin_right  = DEFAULT_MARGIN_RIGHT
+          @margin_header = DEFAULT_MARGIN_HEADER
+          @margin_footer = DEFAULT_MARGIN_FOOTER
+          @margin_gutter = DEFAULT_MARGIN_GUTTER
           
           super options, &block
         end
@@ -45,7 +53,7 @@ module Caracal
         #=============== SETTERS ==============================
         
         # integers
-        [:bottom, :left, :right, :top].each do |m|
+        [:bottom, :left, :right, :top, :header, :footer, :gutter].each do |m|
           define_method "#{ m }" do |value|
             instance_variable_set("@margin_#{ m }", value.to_i)
           end
@@ -55,8 +63,8 @@ module Caracal
         #=============== VALIDATION ==============================
         
         def valid?
-          dims = [:bottom, :left, :right, :top]
-          dims.map { |d| send("margin_#{ d }") }.all? { |d| d > 0 }
+          dims = [:bottom, :left, :right, :top, :header, :footer, :gutter]
+          dims.map { |d| send("margin_#{ d }") }.all? { |d| d >= 0 }
         end
         
         
@@ -66,7 +74,7 @@ module Caracal
         private
         
         def option_keys
-          [:top, :bottom, :left, :right]
+          [:top, :bottom, :left, :right, :header, :footer, :gutter]
         end
         
       end
